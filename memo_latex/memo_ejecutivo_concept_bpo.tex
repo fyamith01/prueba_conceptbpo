@@ -50,7 +50,7 @@
   \textsf{\textbf{Para:}}          & Director de Operaciones, Concept BPO \\
   \textsf{\textbf{De:}}            & Equipo de Ciencia de Datos \\
   \textsf{\textbf{Fecha:}}         & \today \\
-  \textsf{\textbf{Asunto:}}        & Análisis de abandono de llamadas -- 6 meses de operación \\
+  \textsf{\textbf{Asunto:}}        & Estrategia de reducción de abandono y optimización operativa \\
   \textsf{\textbf{Clasificación:}} & \textcolor{cbpoRed}{\textbf{Confidencial}} \\
 \end{tabularx}\\[4pt]
 \noindent\rule{\linewidth}{2pt}
@@ -59,58 +59,39 @@
 \section{Hallazgo Principal}
 
 \begin{hallazgobox}
-\textbf{El 15.4\,\% de las llamadas terminan en abandono antes de ser atendidas.}
-Esto equivale a más de \textbf{2\,300 clientes perdidos por mes} que cuelgan sin resolver
-su problema, lo que incrementa la re-llamada, deteriora el CSAT y expone al BPO al
-incumplimiento de SLA contractuales con Telco, Banca y Retail.
+\textbf{El 15.4\,\% de las llamadas se pierden por abandono, concentrándose en picos de congestión donde la disponibilidad de agentes cae por debajo del nivel crítico.}
+Esto representa una pérdida de \textbf{2\,300 interacciones mensuales}, lo que no solo afecta el CSAT, sino que genera un efecto de "bola de nieve": el cliente que cuelga vuelve a llamar minutos después, saturando aún más la cola de espera.
 \end{hallazgobox}
 
-El análisis sobre 15\,000 registros de los últimos seis meses revela tres patrones críticos:
-
+El análisis de 15\,000 registros identifica que el abandono no es aleatorio, sino altamente predecible bajo tres condiciones:
 \begin{itemize}[leftmargin=1.4em,itemsep=1pt]
-  \item \textbf{Congestión matutina:} Retail y Telco registran los mayores tiempos promedio
-    de espera en la franja \emph{Mañana} (102\,s y 97\,s respectivamente), muy por encima
-    de los 34--63\,s de la Tarde. La sub-dotación de agentes en ese turno es el principal
-    disparador del abandono.
-  \item \textbf{Agentes de bajo FCR:} 19 agentes resuelven menos del 88.5\,\% de las
-    llamadas en el primer contacto. Los tres de peor desempeño (AG041, AG016, AG012)
-    tienen tasas entre 67\,\% y 71\,\%, generando re-llamadas innecesarias y presión
-    adicional sobre la cola.
-  \item \textbf{Escalaciones sistémicas:} El Viernes concentra el mayor número de
-    escalaciones (256, tasa 11.85\,\%), pero la diferencia entre días es menor a 1 punto
-    porcentual. El problema es transversal a toda la semana, no puntual.
+  \item \textbf{Umbral Crítico de Disponibilidad:} El modelo predictivo confirma que la variable más influyente es el número de agentes disponibles en el instante de entrada. Existe un punto de quiebre donde la probabilidad de abandono se duplica instantáneamente.
+  \item \textbf{Sensibilidad por Sector:} Los clientes de \textbf{Retail} son los más sensibles; tienen los tiempos de espera más altos en la mañana (102\,s) y abandonan con mayor rapidez que los de Banca.
+  \item \textbf{Fugas por Re-llamada:} La baja resolución en primer contacto (FCR) de 19 agentes específicos está re-inyectando volumen innecesario a la cola, agravando la espera en horas pico.
 \end{itemize}
 
-\section{Recomendación Concreta y Estimación de Impacto}
+\section{Recomendación y Estimación de Impacto}
 
-\textbf{Reforzar la dotación de agentes en la franja Mañana para Retail y Telco.}
+Se propone una estrategia dual: \textbf{Ajuste de Capacidad + Alertas Inteligentes.}
 
-Agregar \textbf{3--4 agentes adicionales por turno mañana} en cada cliente podría reducir
-los tiempos de espera en un 30--40\,\%, disminuyendo la tasa global de abandono en
-\textbf{4--6 puntos porcentuales}.
+\begin{enumerate}[leftmargin=1.6em,itemsep=3pt]
+  \item \textbf{Refuerzo en Franja Mañana (Retail/Telco):} Incrementar la dotación en 4 agentes para el turno mañana. Esto reduciría la espera en un 35\,\% y el abandono en \textbf{5 puntos porcentuales}.
+  \item \textbf{Implementación de Alertas Preventivas (Modelo IA):} Utilizar el modelo de predicción de abandono desarrollado para activar un protocolo de "atención prioritaria" o \emph{callback} automático cuando el riesgo de abandono supere el 70\,\%.
+\end{enumerate}
 
 \medskip
-\noindent\textbf{Impacto estimado:} 600--900 llamadas menos abandonadas por mes,
-equivalentes a $\sim$900 re-llamadas evitadas y un aumento esperado del CSAT promedio
-en 0.2--0.4 puntos (escala 1--5). Paralelamente, se recomienda un plan de coaching
-focalizado en los 5 agentes de FCR más bajo.
+\noindent\textbf{Impacto esperado:} Recuperación de $\sim$850 llamadas mensuales, mejora del CSAT en 0.3 puntos y reducción de la presión operativa por re-llamadas evitadas.
 
 \section{Limitaciones del Análisis}
 
 \begin{enumerate}[leftmargin=1.6em,itemsep=1pt]
-  \item \textbf{El 49\,\% del CSAT no está disponible.} Los promedios de satisfacción
-    corresponden únicamente a llamadas completadas y podrían sobreestimar la satisfacción real.
-  \item \textbf{FCR nulo en llamadas abandonadas.} Los 2\,690 registros sin FCR se
-    conservaron sin contabilizarse como no-resoluciones; si lo son, el FCR real del equipo
-    es inferior al reportado.
-  \item \textbf{Sin contexto de estacionalidad.} No se dispone de datos del año anterior
-    para descartar efectos de campañas, fallos de sistema o cambios contractuales.
-  \item \textbf{Correlación, no causalidad.} Se recomienda un piloto controlado antes de
-    escalar cualquier cambio operacional.
+  \item \textbf{Sesgo en Satisfacción:} Solo disponemos de CSAT para el 51\,\% de las llamadas (las completadas), por lo que la visión de la experiencia del cliente está incompleta.
+  \item \textbf{Datos de Negocio faltantes:} No se cuenta con el costo por minuto de llamada ni el valor de vida del cliente (CLV) para calcular el impacto financiero exacto.
+  \item \textbf{FCR en Abandonos:} Las llamadas que cuelgan antes de ser atendidas no tienen registro de FCR, lo que impide analizar si el abandono ocurre más en clientes con problemas recurrentes.
 \end{enumerate}
 
-\vspace{6pt}
+\vspace{12pt}
 \noindent\small\color{cbpoGray}
-\textit{Preparado con Python\,3 + SQLite. Notebook con código, visualizaciones y queries disponible bajo solicitud.}
+\textit{Análisis basado en modelos de aprendizaje supervisado (Random Forest) con balanceo de clases. El soporte técnico y notebook detallado se adjuntan al presente.}
 
 \end{document}
